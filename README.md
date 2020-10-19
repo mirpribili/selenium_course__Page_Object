@@ -1,7 +1,7 @@
 # selenium_course__Page_Object
 
 #### STEP1
-- cd $HOME
+- cd $HOME/selenium_course__Page_Object
 - **git clone https://github.com/mirpribili/selenium_course__Page_Object.git**
 - cd selenium_course__Page_Object
 - git --version
@@ -12,11 +12,14 @@
 - git add .;git commit -m "add readme";git push origin
 - **git add .;git commit -m "replace readme";git push origin**
 
+#### STEP2
+- pytest -v --tb=line --language=en test_main_page.py
 
 
 
 
-#Page_Object
+
+# Page_Object
 
 <span><h2>Немного о Code Style</h2>
 
