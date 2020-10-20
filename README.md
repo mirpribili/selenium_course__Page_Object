@@ -19,7 +19,8 @@
 - **cd $HOME/selenium_course__Page_Objec;pytest -v --tb=line --language=en test_main_page.py**
 - **conda deactivate; source $HOME/enviroments/selenium_env/bin/activate**
 
-
+#### STEP4
+- **sublime -> View -> indentation -> convert to Tab**
 
 git clone https://github.com/mirpribili/simpler.git
 
@@ -361,7 +362,39 @@ git clone https://github.com/mirpribili/simpler.git
         login_link.click()</code></pre></span>
 
 
+<span><h2>Первый тест на основе&nbsp;Page Object</h2>
 
+<p>Ура, первый прототип страницы мы уже реализовали! Давайте теперь перепишем тест с помощью Page Object:&nbsp;</p>
+
+<p>1. Откройте файл с вашим тестом&nbsp;<em>test_main_page.py</em></p>
+
+<p>2. В самом верху файла нужно импортировать класс, описывающий главную страницу:&nbsp;</p>
+
+<pre><code class="language-python hljs"><span class="hljs-keyword"><span class="hljs-keyword">from</span></span> .pages.main_page <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> MainPage</code></pre>
+
+<p>3. Теперь преобразуем сам тест в <em>test_main_page.py</em>:&nbsp;</p>
+
+<pre><code class="language-python hljs"><span class="hljs-keyword"><span class="hljs-keyword">from</span></span> .pages.main_page <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> MainPage
+
+
+<span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">test_guest_can_go_to_login_page</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(browser)</span></span></span><span class="hljs-function">:</span></span>
+    link = <span class="hljs-string"><span class="hljs-string">"http://selenium1py.pythonanywhere.com/"</span></span>
+    page = MainPage(browser, link)   <span class="hljs-comment"><span class="hljs-comment"># инициализируем Page Object, передаем в конструктор экземпляр драйвера и url адрес </span></span>
+    page.open()                      <span class="hljs-comment"><span class="hljs-comment"># открываем страницу</span></span>
+    page.go_to_login_page()          <span class="hljs-comment"><span class="hljs-comment"># выполняем метод страницы — переходим на страницу логина</span></span></code></pre>
+
+<p>4. Убедитесь, что тест проходит, запустив его все той же командой:&nbsp;</p>
+
+<pre><code class="hljs routeros">pytest -v <span class="hljs-attribute"><span class="hljs-attribute">--tb</span></span>=line <span class="hljs-attribute"><span class="hljs-attribute">--language</span></span>=en test_main_page.py
+</code></pre>
+
+<p>5.&nbsp;Добавьте изменения и сделайте коммит (с осмысленным сообщением!)</p>
+
+<p>Теперь наш тест <strong>почти </strong>полностью написан в модном стиле Page Object! Почему <strong>почти&nbsp;</strong>— узнаете в следующих шагах.</p>
+
+<p>Обратите внимание на&nbsp; структуру файлов на данном этапе:&nbsp;</p>
+
+<p><img alt="" src="https://ucarecdn.com/b72c7bb8-0ed0-40af-8ad0-b444197247d7/"></p></span>
 
 
 
