@@ -15,8 +15,13 @@
 #### STEP2
 - pytest -v --tb=line --language=en test_main_page.py
 
+#### STEP3
+- **cd $HOME/selenium_course__Page_Objec;pytest -v --tb=line --language=en test_main_page.py**
+- **conda deactivate; source $HOME/enviroments/selenium_env/bin/activate**
 
 
+
+git clone https://github.com/mirpribili/simpler.git
 
 
 # Page_Object
@@ -263,4 +268,107 @@
  Сама идея описывать взаимодействие с продуктом со стороны пользователя выглядит интересно. Но вот реализация ScreenPlay выглядит тяжеловато - смотрю на нее, и не хочется с PageObject на нее переходить.
 
 Кажется, что ScreenPlay больше подходит для заказной разработки, когда есть заказчик, которому нужна прозрачность в том, на что тратит время отдел тестирования. Это также видно в том, что примеры ScreenPlay часто приводят вместе с BDD подходом, который также близок аутсорсинговым компаниям. Для продуктовой компании PageObject выглядит все-таки понятнее, проще, т.к. тестирование обычно это внутренний процесс в компании.
+
+<span><h2>Базовая страница для проекта: BasePage</h2>
+
+<p>Давайте перепишем тест из файла&nbsp;<em>test_main_page.py</em>&nbsp;с помощью паттерна&nbsp;Page Object, который мы добавили на этапе <a href="https://stepik.org/lesson/199980/step/6?unit=174035" rel="noopener noreferrer nofollow">подготовки окружения.</a>&nbsp;Мы будем работать&nbsp;с главной страницей нашего приложения, поэтому дадим&nbsp;классу говорящее название&nbsp;MainPage.&nbsp;</p>
+
+<p><strong>Важно! </strong>В этом уроке мы напишем самостоятельно простую реализацию паттерна Page Object. А в следующих уроках уже рассмотрим существующие фреймворки и то, как они могут облегчить нам жизнь. Сейчас самая главная задача — осознать принципы работы.&nbsp;</p>
+
+<p>1. Создайте в своем проекте папку pages, там мы будем хранить все наши Page Object&nbsp;</p>
+
+<p>2. В папке создайте два файла: <code>base_page.py</code> и <code>main_page.py </code>&nbsp;</p>
+
+<p>Для начала сделаем базовую страницу, от которой будут унаследованы все остальные классы. В ней мы опишем&nbsp;вспомогательные методы для работы с драйвером.</p>
+
+<p>3. В файле <code>base_page.py</code> создайте класс с названием <code>BasePage</code>.&nbsp;</p>
+
+<p>В Python такие вещи делаются с помощью следующей конструкции:&nbsp;</p>
+
+<pre><code class="hljs python"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">BasePage</span></span></span><span class="hljs-params"><span class="hljs-class"><span class="hljs-params">()</span></span></span><span class="hljs-class">:</span></span></code></pre>
+
+<p>4. Теперь в наш класс нужно добавить методы. Первым делом добавим <em>конструктор —&nbsp;</em>метод, который вызывается, когда мы создаем объект. Конструктор объявляется ключевым словом <code>__init__</code>. В него в качестве параметров мы передаем экземпляр драйвера и url адрес. Внутри конструктора сохраняем эти данные как аттрибуты нашего класса. Получается примерно так:&nbsp;</p>
+
+<pre><code class="language-python hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">__init__</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self, browser, url)</span></span></span><span class="hljs-function">:</span></span>
+    self.browser = browser
+    self.url = url</code></pre>
+
+<p>5. Теперь добавим еще один&nbsp;метод open. Он должен открывать нужную страницу в браузере, используя метод get().</p>
+
+<p>Объявите ниже в том же классе:</p>
+
+<pre><code class="language-python hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">open</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self)</span></span></span><span class="hljs-function">:</span></span></code></pre>
+
+<p>и реализуйте этот метод: нужна всего одна строка. Эту строку нужно отправить в качестве ответа на&nbsp;это задание, без отступов.&nbsp;</p>
+
+<p>6. После того как Stepik принял ваш ответ как правильный, добавьте новые файлы в Git и зафиксируйте изменения коммитом (не забудьте осмысленное сообщение).</p>
+
+<p>&nbsp;</p>
+
+<p>В итоге у вас должен следующий код в файле&nbsp;<em>base_page.py</em>:&nbsp;</p>
+
+<pre><code class="hljs ruby"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">BasePage</span></span></span><span class="hljs-class">():</span></span>
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">__init__</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(</span></span><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-params"><span class="hljs-keyword">self</span></span></span></span><span class="hljs-function"><span class="hljs-params">, browser, url)</span></span></span></span>:
+        <span class="hljs-keyword"><span class="hljs-keyword">self</span></span>.browser = browser
+        <span class="hljs-keyword"><span class="hljs-keyword">self</span></span>.url = url
+
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">open</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(</span></span><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-params"><span class="hljs-keyword">self</span></span></span></span><span class="hljs-function"><span class="hljs-params">)</span></span></span></span>: 
+        <span class="hljs-comment"><span class="hljs-comment"># ваша реализация</span></span></code></pre></span>
+
+
+<span><h2>Page Object для главной страницы сайта</h2>
+
+<p>Теперь реализуем Page Object, который будет связан с главной страницей интернет-магазина.&nbsp;</p>
+
+<p>1. Откройте файл <code>main_page.py</code>&nbsp;</p>
+
+<p>2. В нем нужно сделать импорт базового класса BasePage:&nbsp;</p>
+
+<pre><code class="hljs armasm"><span class="hljs-symbol"><span class="hljs-symbol">from</span></span> .<span class="hljs-keyword"><span class="hljs-keyword">base_page </span></span><span class="hljs-meta"><span class="hljs-meta">import</span></span> <span class="hljs-keyword"><span class="hljs-keyword">BasePage</span></span></code></pre>
+
+<p>3. В нем создайте класс&nbsp; <code>MainPage</code>. Его нужно сделать наследником класса <code>BasePage</code>. Класс-предок в Python указывается в скобках:&nbsp;</p>
+
+<pre><code class="hljs haskell"><span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-type"><span class="hljs-class"><span class="hljs-type">MainPage</span></span></span><span class="hljs-class">(</span><span class="hljs-type"><span class="hljs-class"><span class="hljs-type">BasePage</span></span></span><span class="hljs-class">): </span></span></code></pre>
+
+<p>таким образом, класс MainPage будет иметь доступ ко всем атрибутам и методам своего класса-предка.&nbsp;</p>
+
+<p>4. Перенесите&nbsp;метод из предыдущего урока в класс <code>MainPage</code>:</p>
+
+<pre><code class="hljs ruby"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">go_to_login_page</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(browser)</span></span></span></span>:
+&nbsp; &nbsp;login_link = browser.find_element_by_css_selector(<span class="hljs-string"><span class="hljs-string">"#login_link"</span></span>)
+   login_link.click()&nbsp;</code></pre>
+
+<p>Чтобы все работало, надо слегка видоизменить&nbsp;его. В аргументы больше не надо передавать экземпляр браузера, мы его передаем и сохраняем на этапе создания Page Object. Вместо него нужно указать аргумент <code>self</code>&nbsp;, чтобы иметь доступ к атрибутам и методам класса:&nbsp;</p>
+
+<p><code>def go_to_login_page(self):</code></p>
+
+<p>Так как браузер у нас хранится&nbsp;как аргумент класса <code>BasePage</code>, обращаться к нему нужно соответствующим образом&nbsp;с помощью <code>self</code>:&nbsp;</p>
+
+<pre><code class="language-python hljs">self.browser.find_element_by_css_selector(<span class="hljs-string"><span class="hljs-string">"#login_link"</span></span>)</code></pre>
+
+<p>Заодно заменим find на более универсальный:&nbsp;</p>
+
+<pre><code class="hljs stylus">self<span class="hljs-selector-class"><span class="hljs-selector-class">.browser</span></span><span class="hljs-selector-class"><span class="hljs-selector-class">.find_element</span></span>(By<span class="hljs-selector-class"><span class="hljs-selector-class">.CSS_SELECTOR</span></span>, <span class="hljs-string"><span class="hljs-string">"#login_link"</span></span>)</code></pre>
+
+<p>Итого, файл <em>main_page.py:&nbsp;</em></p>
+
+<pre><code class="hljs python"><span class="hljs-keyword"><span class="hljs-keyword">from</span></span> .base_page <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> BasePage
+<span class="hljs-keyword"><span class="hljs-keyword">from</span></span> selenium.webdriver.common.by <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> By
+
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">MainPage</span></span></span><span class="hljs-params"><span class="hljs-class"><span class="hljs-params">(BasePage)</span></span></span><span class="hljs-class">:</span></span> 
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">go_to_login_page</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self)</span></span></span><span class="hljs-function">:</span></span>
+        login_link = self.browser.find_element(By.CSS_SELECTOR, <span class="hljs-string"><span class="hljs-string">"#login_link"</span></span>)
+        login_link.click()</code></pre></span>
+
+
+
+
+
+
+
+
+
+
+
+
 
