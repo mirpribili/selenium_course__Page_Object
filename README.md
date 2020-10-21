@@ -16,7 +16,7 @@
 - pytest -v --tb=line --language=en test_main_page.py
 
 #### STEP3
-- **cd $HOME/selenium_course__Page_Objec;pytest -v --tb=line --language=en test_main_page.py**
+- **cd $HOME/selenium_course__Page_Object;pytest -v --tb=line --language=en test_main_page.py**
 - **conda deactivate; source $HOME/enviroments/selenium_env/bin/activate**
 
 #### STEP4
@@ -395,6 +395,187 @@ git clone https://github.com/mirpribili/simpler.git
 <p>Обратите внимание на&nbsp; структуру файлов на данном этапе:&nbsp;</p>
 
 <p><img alt="" src="https://ucarecdn.com/b72c7bb8-0ed0-40af-8ad0-b444197247d7/"></p></span>
+
+<span><h2>Элементы страниц в паттерне Page Object</h2>
+
+<p>Помните, мы говорили о том, что тесты почти соответствуют подходу&nbsp;Page Object?&nbsp;</p>
+
+<p>Сейчас разберемся, почему <strong>почти&nbsp;</strong>на примере короткой и поучительной истории.</p>
+
+<p>У нас уже есть два тест-кейса, которые так или иначе взаимодействуют со ссылкой на логин. Представим себе&nbsp;ситуацию, что у нас модный быстрый&nbsp;agile: разработчики постоянно вносят изменения в продукт. В&nbsp;какой-то прекрасный момент изменения коснулись и шапки сайта. Вот приходит к вам разработчик с новой ссылкой и говорит протестировать.</p>
+
+<p>Замените линк, на котором запускаются тесты на <a href="http://selenium1py.pythonanywhere.com/catalogue/the-shellcoders-handbook_209?promo=midsummer" rel="noopener noreferrer nofollow" target="_blank">http://selenium1py.pythonanywhere.com/catalogue/the-shellcoders-handbook_209?promo=midsummer</a>&nbsp;</p>
+
+<p>Запустите тесты командой:</p>
+
+<pre><code class="language-bash hljs">pytest -v --tb=line --language=en test_main_page.py</code></pre>
+
+<p>Тесты упали, и теперь нам нужно их поддерживать, то есть <em>чинить.&nbsp;</em>Подберите новый селектор к ссылке на логин.&nbsp;</p>
+
+<p>Нам придется&nbsp;поправить в файле <em>main_page.py</em>&nbsp;несколько мест, где используется измененный селектор. Посчитайте, сколько строк вам нужно будет отредактировать, чтобы починить ваши тесты, и внесите полученное число&nbsp;в первое поле ответа ниже.&nbsp;</p>
+
+<p>Чтобы этого избежать, при проектировании тестов (да и вообще кода) хорошей практикой является выносить селектор&nbsp;во внешнюю переменную.&nbsp;</p>
+
+<p>Давайте этим и займемся:&nbsp;</p>
+
+<p>1. В папке pages создайте новый файл <em>locators.py&nbsp;</em></p>
+
+<p>2. Внутри создайте новый класс. Каждый класс будет соответствовать каждому классу PageObject:&nbsp;</p>
+
+<pre><code class="hljs stylus">from selenium<span class="hljs-selector-class"><span class="hljs-selector-class"><span class="hljs-selector-class"><span class="hljs-selector-class">.webdriver</span></span></span></span><span class="hljs-selector-class"><span class="hljs-selector-class"><span class="hljs-selector-class"><span class="hljs-selector-class">.common</span></span></span></span><span class="hljs-selector-class"><span class="hljs-selector-class"><span class="hljs-selector-class"><span class="hljs-selector-class">.by</span></span></span></span> import By
+
+
+class MainPageLocators():
+    LOGIN_LINK = (By<span class="hljs-selector-class"><span class="hljs-selector-class"><span class="hljs-selector-class"><span class="hljs-selector-class">.CSS_SELECTOR</span></span></span></span>, <span class="hljs-string"><span class="hljs-string"><span class="hljs-string"><span class="hljs-string">"#login_link"</span></span></span></span>)</code></pre>
+
+<p>теперь каждый селектор&nbsp;— это пара: как искать и что искать.&nbsp;</p>
+
+<p>3. В файле main_page.py импортируйте новый класс с локаторами&nbsp;</p>
+
+<pre><code class="hljs capnproto"><span class="hljs-keyword"><span class="hljs-keyword"><span class="hljs-keyword"><span class="hljs-keyword">from</span></span></span></span> .locators <span class="hljs-keyword"><span class="hljs-keyword"><span class="hljs-keyword"><span class="hljs-keyword">import</span></span></span></span> MainPageLocators</code></pre>
+
+<p>4. Теперь в классе MainPage замените все&nbsp;строки, где содержится "<strong>#login_link</strong>" таким образом:</p>
+
+<pre><code class="language-python hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span></span></span></span></span><span class="hljs-function"><span class="hljs-function"><span class="hljs-function"> </span></span></span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title"><span class="hljs-function"><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">should_be_login_link</span></span></span></span></span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self)</span></span></span></span></span></span></span><span class="hljs-function"><span class="hljs-function"><span class="hljs-function">:</span></span></span></span>
+    <span class="hljs-keyword"><span class="hljs-keyword"><span class="hljs-keyword"><span class="hljs-keyword">assert</span></span></span></span> self.is_element_present(*MainPageLocators.LOGIN_LINK), <span class="hljs-string"><span class="hljs-string"><span class="hljs-string"><span class="hljs-string">"Login link is not presented"</span></span></span></span></code></pre>
+
+<p>Обратите внимание здесь на символ<strong> *</strong>, он указывает на то, что мы передали именно пару, и этот кортеж нужно распаковать.&nbsp;</p>
+
+<p>5. Запустите тесты с помощью той же самой команды:&nbsp;</p>
+
+<pre><code class="language-bash hljs">pytest -v --tb=line --language=en test_main_page.py</code></pre>
+
+<p>Они,&nbsp;конечно, снова упадут. Но теперь посчитайте, сколько строк вам нужно будет отредактировать, когда тесты написаны в такой конфигурации? Внесите число во второе поле ответа.&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p><strong>Итак, PageObject&nbsp;— это не только <em>методы</em>, но и <em>элементы</em>.&nbsp;&nbsp;</strong></p>
+
+<p>Исправлять руками сломанные селекторы во всем проекте&nbsp;— долго и муторно, и есть большой риск забыть и оставить старый селектор. Когда мы выносим селекторы в отдельную сущность, мы уменьшаем время на поддержку тестов и сильно упрощаем себе жизнь в долгосрочной перспективе.&nbsp;</p>
+
+<p>А ещё&nbsp;спринт спустя промоакция закончилась, и фичу с изменением шапки откатили назад.&nbsp;Теперь ссылка&nbsp;работает так же, как раньше. Удалите ссылку с промоакцией, и верните обычную ссылку для запуска тестов:&nbsp;</p>
+
+<pre><code class="hljs ini"><span class="hljs-attr"><span class="hljs-attr"><span class="hljs-attr"><span class="hljs-attr">link</span></span></span></span> = <span class="hljs-string"><span class="hljs-string"><span class="hljs-string"><span class="hljs-string">"http://selenium1py.pythonanywhere.com/"</span></span></span></span></code></pre>
+
+<p>Не забудьте вернуть старый&nbsp;селектор <strong>#login_link</strong>, так чтобы тесты снова проходили. Они&nbsp;нам еще пригодятся!&nbsp;</p></span>
+
+
+<span><h2>Реализация LoginPage</h2>
+
+<p>Если вы хорошо ориентируетесь в тест-дизайне, скорее всего вас немного коробит тест с переходом к логину&nbsp;— там ведь нет никаких проверок.&nbsp;Давайте&nbsp;проверим,&nbsp;что мы действительно перешли на страницу логина. Для этого нам&nbsp;будет нужен&nbsp;новый Page Object. Заодно разберемся, как между ними переключаться в ходе теста.&nbsp;</p>
+
+<p>Скачайте <a href="https://stepik.org/media/attachments/lesson/199980/login_page.py" rel="noopener noreferrer nofollow">файл</a> с шаблоном&nbsp;для LoginPage. Добавьте его в папку pages. Внутри есть заглушки для методов проверок:&nbsp;</p>
+
+<pre><code class="hljs mipsasm"><span class="hljs-keyword"><span class="hljs-keyword">should_be_login_url
+</span></span><span class="hljs-keyword"><span class="hljs-keyword">should_be_login_form
+</span></span><span class="hljs-keyword"><span class="hljs-keyword">should_be_register_form</span></span></code></pre>
+
+<p>Реализуйте их самостоятельно:&nbsp;</p>
+
+<p>1. В файле locators.py создайте класс&nbsp;LoginPageLocators&nbsp;</p>
+
+<p>2. Подберите селекторы к формам регистрации и логина, добавьте их в класс&nbsp;LoginPageLocators</p>
+
+<p>3. Напишите проверки, используя эти селекторы. Не забудьте через запятую указать адекватное сообщение об ошибке. Напишите сначала красный тест, чтобы убедиться в понятности вывода.&nbsp;</p>
+
+<p>4. В методе should_be_login_url реализуйте проверку, что подстрока "login" есть в текущем url&nbsp;браузера. Для этого используйте соответствующее&nbsp;<a href="https://selenium-python.readthedocs.io/api.html#selenium.webdriver.remote.webdriver.WebDriver.current_url" rel="noopener noreferrer nofollow" target="_blank">свойство Webdriver</a>.</p>
+
+<p>5. Добавьте изменения в коммит с осмысленным сообщением</p>
+
+<p>Теперь посмотрим,&nbsp;как можно осуществлять переход между страницами.&nbsp;</p></span>
+
+
+
+
+<span><h2>Переходы между страницами</h2>
+
+<p>Переход можно реализовать двумя разными способами.&nbsp;</p>
+
+<p>Первый способ: возвращать нужный Page Object.</p>
+
+<p>Для этого в файле main_page.py нужно сделать импорт страницы с логином:&nbsp;</p>
+
+<pre><code class="language-python hljs"><span class="hljs-keyword"><span class="hljs-keyword">from</span></span> .login_page <span class="hljs-keyword"><span class="hljs-keyword">import</span></span> LoginPage</code></pre>
+
+<p>Затем в методе, который осуществляет переход к&nbsp;странице логина, проинициализировать новый объект Page&nbsp;и вернуть его:&nbsp;</p>
+
+<pre><code class="language-python hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">go_to_login_page</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self)</span></span></span><span class="hljs-function">:</span></span>
+    link = self.browser.find_element(*MainPageLocators.LOGIN_LINK)
+    link.click()
+    <span class="hljs-keyword"><span class="hljs-keyword">return</span></span> LoginPage(browser=self.browser, url=self.browser.current_url) </code></pre>
+
+<p>Обратите внимание! При создании объекта мы обязательно&nbsp;передаем ему тот же самый объект драйвера для работы с браузером, а в качестве url передаем текущий адрес.</p>
+
+<p>Теперь в тесте нам не нужно думать про инициализацию страницы: она уже создана. Сохранив возвращаемое значение в переменную, мы можем использовать методы новой страницы в тесте:</p>
+
+<pre><code class="hljs routeros">def test_guest_can_go_to_login_page(browser):
+    link = <span class="hljs-string"><span class="hljs-string">"http://selenium1py.pythonanywhere.com"</span></span>
+   <span class="hljs-built_in"><span class="hljs-built_in"> page </span></span>= MainPage(browser, link)
+    page.open()
+    login_page = page.go_to_login_page()
+    login_page.should_be_login_page()</code></pre>
+
+<p>Плюсы такого подхода:&nbsp;</p>
+
+<ul>
+	<li>тест выглядит аккуратнее — не нужно инициализировать страницу в теле теста;</li>
+	<li>явно возвращаем страницу — тип страницы ассоциирован с методом;</li>
+	<li>не нужно каждый раз думать в разных тестах про инициализацию страницы — уменьшаем дублирование кода;</li>
+</ul>
+
+<p>минусы:&nbsp;</p>
+
+<ul>
+	<li>если у нас копится большое количество страниц и переходов — образуется много перекрестных импортов;</li>
+	<li>большая связность кода — при изменении логики придется менять возвращаемое значение;</li>
+	<li>сложнее понимать код, так как&nbsp;страница инициализируется неявно;</li>
+	<li>образуются циклические зависимости, что часто приводит к ошибкам.</li>
+</ul>
+
+<p>Второй подход: переход происходит неявно, страницу инициализируем в теле теста:&nbsp;</p>
+
+<p>1. Закомментируйте строку с возвращаемым значением&nbsp;</p>
+
+<pre><code class="language-python hljs"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">go_to_login_page</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self)</span></span></span><span class="hljs-function">:</span></span>
+    link = self.browser.find_element(*MainPageLocators.LOGIN_LINK)
+    link.click()
+    <span class="hljs-comment"><span class="hljs-comment"># return LoginPage(browser=self.browser, url=self.browser.current_url) </span></span></code></pre>
+
+<p>2. Инициализируем LoginPage в теле теста (не забудьте импортировать в файл нужный класс):&nbsp;</p>
+
+<pre><code class="hljs routeros"><span class="hljs-keyword"><span class="hljs-keyword">from</span></span> .pages.login_page import LoginPage
+
+def test_guest_can_go_to_login_page(browser):
+    link = <span class="hljs-string"><span class="hljs-string">"http://selenium1py.pythonanywhere.com"</span></span>
+   <span class="hljs-built_in"><span class="hljs-built_in"> page </span></span>= MainPage(browser, link)
+    page.open()
+    page.go_to_login_page()
+    login_page = LoginPage(browser, browser.current_url)
+    login_page.should_be_login_page()</code></pre>
+
+<p>Плюсы:</p>
+
+<ul>
+	<li>меньше связность кода;</li>
+	<li>меньше импортов, нет перекрестных импортов;</li>
+	<li>больше гибкость;</li>
+	<li>в тесте понятнее что происходит, т.к. явно инициализируем страницу.</li>
+</ul>
+
+<p>Минусы:</p>
+
+<ul>
+	<li>появляется лишний шаг в тест-кейсе;</li>
+	<li>каждый раз при написании теста нужно думать про корректные переходы;</li>
+	<li>дублируется код.</li>
+</ul>
+
+<p>И тот и другой подход можно успешно применять в своих проектах, главное делать это с умом. Сейчас оставьте второй вариант с явной инициализацией страниц в теле теста, чтобы избежать лишних сложностей с циклическими зависимостями.&nbsp;</p>
+
+<p>Уберите лишний закомментированный код, и зафиксируйте изменения в коммите с осмысленным сообщением.</p></span>
+
+
+
 
 
 
