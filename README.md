@@ -46,8 +46,12 @@
 #### STEP4
 - **sublime -> View -> indentation -> convert to Tab**
 - **pytest -s test_product_page.py**
+- **pytest -s test_main_page.py**
+- **pytest -v --tb=line --language=en test_main_page.py**
 
 
+#### STEP 5        
+- **pytest -v --tb=line --language=en -m need_review**
 
 
 <span><h2>Немного о Code Style</h2>
@@ -859,6 +863,180 @@ def test_guest_can_go_to_login_page(browser):
 
 <p>Зафиксируйте изменения коммитом.&nbsp;</p></span>
 
+<span><h2>Задание: наследование и отрицательные проверки</h2>
+
+<p>В файл<em>&nbsp;test_main_page.py</em> добавьте тест с названием</p>
+
+<p><samp><strong>&nbsp;test_guest_cant_see_product_in_basket_opened_from_main_page:</strong></samp></p>
+
+<ol>
+	<li>Гость открывает главную страницу&nbsp;</li>
+	<li>Переходит в корзину по кнопке в шапке сайта</li>
+	<li>Ожидаем, что в&nbsp;корзине нет товаров</li>
+	<li>Ожидаем, что есть текст о том что корзина пуста&nbsp;</li>
+</ol>
+
+<p>В файле <em>test_product_page.py&nbsp;</em>добавьте тест с названием</p>
+
+<p><strong><samp>test_guest_cant_see_product_in_basket_opened_from_product_page:</samp></strong></p>
+
+<ol>
+	<li>Гость открывает страницу товара</li>
+	<li>Переходит в корзину по кнопке в шапке&nbsp;</li>
+	<li>Ожидаем, что в&nbsp;корзине нет товаров</li>
+	<li>Ожидаем, что есть текст о том что корзина пуста&nbsp;</li>
+</ol>
+
+<p>В классе <strong>BasePage</strong> реализуйте соответствующий метод для перехода в корзину. Создайте файл <em>basket_page.py</em> и в нем&nbsp;класс <strong>BasketPage</strong>.&nbsp;Реализуйте там необходимые проверки, в том числе отрицательную, которую мы обсуждали в предыдущих шагах.&nbsp;</p>
+
+<p>Убедитесь, что тесты проходят и зафиксируйте изменения в коммите.&nbsp;</p></span>
+
+<span><h2>Группировка тестов: setup&nbsp;</h2>
+
+<p>А сейчас воспользуемся магией ООП уже для организации кода самих тест-кейсов. PyTest позволяет объединять несколько тест-кейсов в один класс.&nbsp;Зачем это делать и почему удобно?&nbsp;</p>
+
+<p><strong>Во-первых,</strong> мы можем логически сгруппировать тесты в один класс просто ради более стройного кода: удобно, когда тесты, связанные с одним компонентом лежат в одном классе, а с помощью <strong>pytest.mark</strong> можно помечать сразу весь класс. Основное правило такое: название класса должно начинаться с <strong>Test</strong>, чтобы PyTest смог его обнаружить и запустить.</p>
+
+<p>Давайте например объединим в группу два теста в файле <em>test_main_page.py</em> и пометим его меткой <strong>login_guest</strong>:</p>
+
+<pre><code class="language-python hljs"><span class="hljs-meta"><span class="hljs-meta">@pytest.mark.login_guest</span></span>
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">TestLoginFromMainPage</span></span></span><span class="hljs-params"><span class="hljs-class"><span class="hljs-params">()</span></span></span><span class="hljs-class">:</span></span>
+    <span class="hljs-comment"><span class="hljs-comment"># не забываем передать первым аргументом self                       </span></span>
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">test_guest_can_go_to_login_page</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self, browser)</span></span></span><span class="hljs-function">:</span></span>     
+         <span class="hljs-comment"><span class="hljs-comment"># реализация теста</span></span>
+
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">test_guest_should_see_login_link</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self, browser)</span></span></span><span class="hljs-function">:</span></span>
+         <span class="hljs-comment"><span class="hljs-comment"># реализация теста</span></span></code></pre>
+
+<p>Попробуйте запустить тесты в этом файле с меткой (нужно добавить "<strong>-m</strong> <strong>login_guest</strong>"). Вы увидите, что запустились оба теста, хотя метка всего одна.&nbsp;</p>
+
+<p><strong>Во-вторых,</strong>&nbsp;для разных тест-кейсов можно выделять общие функции, чтобы не повторять код. Эти функции называются <strong>setup —</strong> функция,&nbsp;которая выполнится перед запуском каждого теста&nbsp;из класса, обычно туда входит подготовка данных, и <strong>teardown —</strong> функция, которая выполняется ПОСЛЕ каждого теста из класса, обычно там происходит удаление тех данных, которые мы создали во время теста. Хороший автотест должен сработать даже на чистой базе данных&nbsp;и удалить за собой сгенерированные в тесте данные. Такие функции&nbsp;реализуются с помощью фикстур, которые мы изучили в предыдущем модуле. Чтобы функция запускалась автоматически перед каждым тест-кейсом, нужно пометить её как <strong>@pytest.fixture</strong> с параметрами <strong>scope="function"</strong>,<strong>&nbsp;</strong>что значит запускать на каждую функцию, и&nbsp;<strong>autouse=True</strong>,<strong>&nbsp;</strong>что&nbsp;значит запускать автоматически&nbsp;без явного вызова фикстуры.</p>
+
+<p>Мы уже немного говорили про независимость от контента в предыдущих шагах — идеальным решением было бы везде, где мы работаем со страницей продукта, создавать новый товар в нашем интернет-магазине перед тестом&nbsp;и удалять по завершении теста. К сожалению, наш интернет-магазин пока не имеет возможности создавать объекты по API,&nbsp;но в идеальном мире мы бы написали вот такой тест-класс в файле <em>test_product_page.py:</em></p>
+
+<pre><code class="language-python hljs"><span class="hljs-meta"><span class="hljs-meta">@pytest.mark.login</span></span>
+<span class="hljs-class"><span class="hljs-keyword"><span class="hljs-class"><span class="hljs-keyword">class</span></span></span><span class="hljs-class"> </span><span class="hljs-title"><span class="hljs-class"><span class="hljs-title">TestLoginFromProductPage</span></span></span><span class="hljs-params"><span class="hljs-class"><span class="hljs-params">()</span></span></span><span class="hljs-class">:</span></span>
+<span class="hljs-meta"><span class="hljs-meta">    @pytest.fixture(scope="function", autouse=True)</span></span>
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">setup</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self)</span></span></span><span class="hljs-function">:</span></span>
+        self.product = ProductFactory(title = <span class="hljs-string"><span class="hljs-string">"Best book created by robot"</span></span>)
+        <span class="hljs-comment"><span class="hljs-comment"># создаем по апи</span></span>
+        self.link = self.product.link
+        <span class="hljs-keyword"><span class="hljs-keyword">yield</span></span>
+        <span class="hljs-comment"><span class="hljs-comment"># после этого ключевого слова начинается teardown</span></span>
+        <span class="hljs-comment"><span class="hljs-comment"># выполнится после каждого теста в классе</span></span>
+        <span class="hljs-comment"><span class="hljs-comment"># удаляем те данные, которые мы создали </span></span>
+        self.product.delete()
+        
+
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">test_guest_can_go_to_login_page_from_product_page</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self, browser)</span></span></span><span class="hljs-function">:</span></span>
+        page = ProductPage(browser, self.link)
+        <span class="hljs-comment"><span class="hljs-comment"># дальше обычная реализация теста</span></span>
+
+    <span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">test_guest_should_see_login_link</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(self, browser)</span></span></span><span class="hljs-function">:</span></span>
+        page = ProductPage(browser, self.link)
+        <span class="hljs-comment"><span class="hljs-comment"># дальше обычная реализация теста</span></span></code></pre>
+
+<p>Работа с API&nbsp;выходит за рамки этого курса, но знание о том,&nbsp;что можно группировать тесты и выделять подготовительные шаги в единые для всех тестов функции — важно для каждого автоматизатора.</p></span>
+
+
+<span><h2>Задание: группировка тестов и setup</h2>
+
+<p><span style="color: #ff4363;"><strong>ВАЖНО!&nbsp;</strong></span>Вообще говоря манипулировать браузером в сетапе и уж тем более что-то там проверять — это плохая практика, лучше так не делать без особой необходимости. Здесь этот пример исключительно в учебных целях, чтобы вы попробовали писать сетапы для тестов. В реальной жизни мы реализовали бы все эти манипуляции с помощью API или напрямую через базу данных.</p>
+
+<p>В этом задании мы хотим добавить тестовые сценарии не только для гостей сайта, но и для зарегистрированных пользователей. Для этого:</p>
+
+<ol>
+	<li>В файле <em>test_product_page.py</em> добавьте новый класс для тестов <strong>TestUserAddToBasketFromProductPage.</strong></li>
+	<li>Добавьте туда уже написанные тесты <strong>test_guest_cant_see_success_message</strong> и <strong>test_guest_can_add_product_to_basket</strong> и переименуйте, заменив <strong>guest</strong> на <strong>user</strong>. Шаги тестов не изменятся, добавится лишь регистрация перед тестами. Параметризация здесь уже не нужна, не добавляйте её.&nbsp;</li>
+	<li>Добавьте в <strong>LoginPage</strong> метод <strong>register_new_user(email, password),</strong>&nbsp;который принимает две строки и регистрирует пользователя. Реализуйте его, описав соответствующие элементы страницы.</li>
+	<li>Добавьте в <strong>BasePage</strong> проверку того, что пользователь залогинен:
+	<pre><code class="hljs ruby"><span class="hljs-function"><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-keyword">def</span></span></span><span class="hljs-function"> </span><span class="hljs-title"><span class="hljs-function"><span class="hljs-title">should_be_authorized_user</span></span></span><span class="hljs-params"><span class="hljs-function"><span class="hljs-params">(</span></span><span class="hljs-keyword"><span class="hljs-function"><span class="hljs-params"><span class="hljs-keyword">self</span></span></span></span><span class="hljs-function"><span class="hljs-params">)</span></span></span></span>:
+    assert <span class="hljs-keyword"><span class="hljs-keyword">self</span></span>.is_element_present(*BasePageLocators.USER_ICON), <span class="hljs-string"><span class="hljs-string">"User icon is not presented,"</span></span> \
+                                                                 <span class="hljs-string"><span class="hljs-string">" probably unauthorised user"</span></span></code></pre>
+	</li>
+	<li>Селектор соответственно в <strong>BasePageLocators</strong>:
+	<pre><code class="language-python hljs">USER_ICON = (By.CSS_SELECTOR, <span class="hljs-string"><span class="hljs-string">".icon-user"</span></span>)</code></pre>
+	</li>
+	<li>Добавьте в класс фикстуру setup. В этой функции нужно:
+	<ul>
+		<li>открыть страницу регистрации;</li>
+		<li>зарегистрировать нового пользователя;</li>
+		<li>проверить, что пользователь залогинен.</li>
+	</ul>
+	</li>
+	<li>Запустите оба теста и убедитесь,&nbsp;что они проходят и действительно регистрируют новых пользователей</li>
+	<li>Зафиксируйте изменения в репозитории коммитом с осмысленным сообщением&nbsp;</li>
+</ol>
+
+<p><strong>Примечание:&nbsp;</strong></p>
+
+<p><strong>yield</strong> писать не нужно — пользователей удалять мы не умеем. Генерировать email адреса для пользователей можно по-разному, один из вариантов,&nbsp;чтобы избежать повторения, использовать текущее время с помощью модуля&nbsp;<strong>time</strong>:</p>
+
+<pre><code class="language-python hljs"><span class="hljs-keyword"><span class="hljs-keyword">import</span></span> time <span class="hljs-comment"><span class="hljs-comment"># в начале файла</span></span>
+
+email = str(time.time()) + <span class="hljs-string"><span class="hljs-string">"@fakemail.org"</span></span></code></pre>
+
+<p>&nbsp;</p>
+
+<ol>
+</ol></span>
+
+
+<span><h2>Финишная прямая: готовим код к ревью</h2>
+
+<p>Поздравляем, вы уже почти закончили свой финальный проект! В следующем шаге вы отправите его на оценку сокурсникам, а сейчас время немного причесать его и довести до совершенства. Следуйте этим советам, чтобы получить максимальные&nbsp; баллы:</p>
+
+<p>1. Убедитесь, что в репозитории есть все нужные файлы. Все файлы, где хранятся страницы, лежат в отдельной папке pages. В итоге структура файлов и папок должна выглядеть&nbsp;так:</p>
+
+<p><img alt="" src="https://ucarecdn.com/88e81910-80c4-40e1-ba95-396f168e75b9/"></p>
+
+<p>Убедитесь, что ничего не потерялось. Обратите внимание обязательно на conftest.py.&nbsp;</p>
+
+<p>2. Проверьте <strong>requirements.txt</strong> и убедитесь что там указаны нужные версии пакетов, как минимум:&nbsp;</p>
+
+<pre><code class="hljs ini"><span class="hljs-attr"><span class="hljs-attr">pytest</span></span>==<span class="hljs-number"><span class="hljs-number">5.1</span></span>.<span class="hljs-number"><span class="hljs-number">1</span></span>
+<span class="hljs-attr"><span class="hljs-attr">selenium</span></span>==<span class="hljs-number"><span class="hljs-number">3.14</span></span>.<span class="hljs-number"><span class="hljs-number">0</span></span>
+</code></pre>
+
+<p>Желательно, чтобы там еще не было лишнего. Помните, что задание будут проверять ваши сокурсники, и им вряд ли понравится ставить огромную кучу пакетов.&nbsp;</p>
+
+<p>3. Проверьте, что все тесты, описанные в&nbsp;<em>test_main_page.py&nbsp;</em>и <em>test_product_page.py</em><strong>&nbsp;</strong>запускаются и проходят (очевидно, за исключением тех, которые помечены как <strong>xfail/skip</strong>).&nbsp;</p>
+
+<p>4. Проверьте стиль кода. Представьте, что ваш код будет читать человек, который никогда не программировал и не автоматизировал тестирование&nbsp;— ему должно быть понятно, что происходит.&nbsp;</p>
+
+<p>Убедитесь что все переменные, методы и классы, которые вы создаете, называются осмысленно.&nbsp;</p>
+
+<p>Удалите весь ненужный закомментированный код, помним, что захламлять репозиторий лишним — плохой тон.&nbsp;</p>
+
+<p>5. Откройте&nbsp;<em>test_product_page.py</em><strong>.&nbsp;</strong>Убедитесь, что там есть следующие тесты:&nbsp;</p>
+
+<p><samp><code>test_user_can_add_product_to_basket</code></samp></p>
+
+<p><samp><code>test_guest_can_add_product_to_basket</code></samp></p>
+
+<p><samp><code>test_guest_cant_see_product_in_basket_opened_from_product_page</code></samp></p>
+
+<p><code><samp>test_guest_can_go_to_login_page_from_product_page</samp></code></p>
+
+<p><span style="color: #000000;">Отмаркируйте эти тесты меткой:</span></p>
+
+<p><strong><samp><code>@pytest.mark.need_review</code></samp></strong></p>
+
+<p>Не забудьте зарегистрировать метку, чтобы избежать предупреждений: <a href="https://stepik.org/lesson/236918/step/2?unit=209305" rel="noopener noreferrer nofollow">Как же регистрировать метки?</a></p>
+
+<p>Убедитесь, что при запуске с помощью следующей команды тесты запускаются и успешно проходят:&nbsp;</p>
+
+<pre><code class="hljs routeros">pytest&nbsp;-v <span class="hljs-attribute"><span class="hljs-attribute">--tb</span></span>=line <span class="hljs-attribute"><span class="hljs-attribute">--language</span></span>=en -m need_review</code></pre>
+
+<p>6. Убедитесь, что все тесты написаны в стиле PageObject: нет <strong>assert</strong> в теле тестов, все методы действия и проверки выделены в отдельные методы в классах PageObject, все селекторы&nbsp;лежат в <strong>locators.py.</strong></p>
+
+<p>7. Зафиксируйте все изменения коммитом. Не добавляйте локальные файлы окружения, файлы ide и прочие вспомогательные вещи в отслеживаемые. Нужен только код!</p>
+
+<p>8. Сделайте пуш изменений в свой репозиторий.</p>
+
+<p>9. Откройте репозиторий на GitHub и перепроверьте пункты 1, 2, 4, 5 и&nbsp;6.</p>
+
+<p>10. Порадуйтесь за себя и переходите к следующему шагу.</p></span>
 
 
 

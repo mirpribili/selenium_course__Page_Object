@@ -23,7 +23,7 @@ class bcolors:
 class BasePage():
     # Добавляем конструктор (__init__) — метод, который вызывается, когда мы создаем объект.
     # И передаем в качестве параметров экземпляр драйвера и url адрес.
-    def __init__(self, browser, url, timeout=1): #print("les4.3.6-3")
+    def __init__(self, browser, url, timeout=10): #print("les4.3.6-3")
         self.browser = browser
         self.url = url
         self.browser.implicitly_wait(timeout)
