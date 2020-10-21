@@ -9,10 +9,21 @@ import math
 from .locators import BasePageLocators
 
 
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 class BasePage():
     # Добавляем конструктор (__init__) — метод, который вызывается, когда мы создаем объект.
     # И передаем в качестве параметров экземпляр драйвера и url адрес.
-    def __init__(self, browser, url, timeout=10):
+    def __init__(self, browser, url, timeout=1): #print("les4.3.6-3")
         self.browser = browser
         self.url = url
         self.browser.implicitly_wait(timeout)
@@ -61,7 +72,8 @@ class BasePage():
         try:
             alert = self.browser.switch_to.alert
             alert_text = alert.text
-            print(f"Your code: {alert_text}")
+            #print(f"Your code: {alert_text}")
+            print(f"{bcolors.OKGREEN}Your code: {alert_text}{bcolors.ENDC}")
             alert.accept()
         except NoAlertPresentException:
             print("No second alert presented")
